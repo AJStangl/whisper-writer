@@ -8,16 +8,16 @@
     },
     "local_model_options": {
         "model": "base",
-        "device": "auto",
-        "compute_type": "auto",
+        "device": "cuda",
+        "compute_type": "float16",
         "language": null,
         "temperature": 0.0,
         "initial_prompt": null,
         "condition_on_previous_text": true,
         "vad_filter": false
     },
-    "activation_key": "ctrl+shift+space",
-    "recording_mode": "voice_activity_detection",
+    "activation_key": "ctrl+alt+shift",
+    "recording_mode": "hold_to_record",
     "sound_device": null,
     "sample_rate": 16000,
     "silence_duration": 900,
@@ -26,6 +26,5 @@
     "remove_trailing_period": false,
     "add_trailing_space": true,
     "remove_capitalization": false,
-    "print_to_terminal": true,
-    "hide_status_window": false
+    "print_to_terminal": true
 }
