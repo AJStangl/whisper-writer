@@ -5,20 +5,23 @@ import tkinter as tk
 import threading
 from PIL import Image, ImageTk
 
-
 class StatusWindow(threading.Thread):
     def __init__(self, status_queue):
         threading.Thread.__init__(self)
         self.status_queue = status_queue
+        self.recording_thread = None  # Initialize recording_thread
 
     def schedule_check(self, func):
         if hasattr(self, 'window'):
             self.window.after(100, func)
 
     def handle_close_button(self):
-        if hasattr(self, 'recording_thread'):
+        if self.recording_thread:
             self.recording_thread.stop()
         self.status_queue.put(('cancel', ''))
+        self.window.quit()
+        self.window.destroy()
+        gc.collect()
 
     def run(self):
         self.window = tk.Tk()
@@ -41,16 +44,20 @@ class StatusWindow(threading.Thread):
         self.label.place(x=140, y=40, anchor='center')
 
         # Load and display the icons
-        self.microphone_image = Image.open(os.path.join('assets', 'microphone.png'))
-        self.microphone_image = self.microphone_image.resize((32, 32), Image.ANTIALIAS)
-        self.microphone_photo = ImageTk.PhotoImage(self.microphone_image)
+        try:
+            self.microphone_image = Image.open(os.path.join('assets', 'microphone.png'))
+            self.microphone_image = self.microphone_image.resize((32, 32), Image.ANTIALIAS)
+            self.microphone_photo = ImageTk.PhotoImage(self.microphone_image)
 
-        self.pencil_image = Image.open(os.path.join('assets', 'pencil.png'))
-        self.pencil_image = self.pencil_image.resize((32, 32), Image.ANTIALIAS)
-        self.pencil_photo = ImageTk.PhotoImage(self.pencil_image)
+            self.pencil_image = Image.open(os.path.join('assets', 'pencil.png'))
+            self.pencil_image = self.pencil_image.resize((32, 32), Image.ANTIALIAS)
+            self.pencil_photo = ImageTk.PhotoImage(self.pencil_image)
 
-        self.icon_label = tk.Label(self.window, image=self.microphone_photo, bg='#B0C4DE')
-        self.icon_label.place(x=50, y=40, anchor='center')
+            self.icon_label = tk.Label(self.window, image=self.microphone_photo, bg='#B0C4DE')
+            self.icon_label.place(x=50, y=40, anchor='center')
+        except Exception as e:
+            print(f"Error loading images: {e}")
+            self.label.config(text="Error loading images")
 
         # Close button
         self.close_button = tk.Button(self.window, text='X', font=('Arial', 12, 'bold'), bg='#B0C4DE',
@@ -73,6 +80,9 @@ class StatusWindow(threading.Thread):
             elif status == 'transcribing' and hasattr(self, 'window'):
                 self.icon_label.config(image=self.pencil_photo)
                 self.label.config(text=text)
-            self.window.after(100, self.process_queue)
         except queue.Empty:
+            pass
+        except Exception as e:
+            self.label.config(text=f"Error: {e}")
+        finally:
             self.window.after(100, self.process_queue)
