@@ -8,8 +8,8 @@
     },
     "local_model_options": {
         "model": "base",
-        "device": "cuda",
-        "compute_type": "float16",
+        "device": "cpu",
+        "compute_type": "auto",
         "language": null,
         "temperature": 0.0,
         "initial_prompt": null,
