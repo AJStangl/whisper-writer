@@ -10,15 +10,19 @@ class StatusWindow(threading.Thread):
     def __init__(self, status_queue):
         threading.Thread.__init__(self)
         self.status_queue = status_queue
+        self.recording_thread = None
 
     def schedule_check(self, func):
         if hasattr(self, 'window'):
             self.window.after(100, func)
 
     def handle_close_button(self):
-        if hasattr(self, 'recording_thread'):
+        if self.recording_thread:
             self.recording_thread.stop()
         self.status_queue.put(('cancel', ''))
+        self.window.quit()
+        self.window.destroy()
+        gc.collect()
 
     def run(self):
         self.window = tk.Tk()
@@ -73,6 +77,9 @@ class StatusWindow(threading.Thread):
             elif status == 'transcribing' and hasattr(self, 'window'):
                 self.icon_label.config(image=self.pencil_photo)
                 self.label.config(text=text)
-            self.window.after(100, self.process_queue)
         except queue.Empty:
+            pass
+        except Exception as e:
+            self.label.config(text=f"Error: {e}")
+        finally:
             self.window.after(100, self.process_queue)
