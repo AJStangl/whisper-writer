@@ -1,3 +1,7 @@
+echo ":: Preparing Enviroment File"
+
+cp .env.example .env
+
 echo ":: Installing Python Virtual Environment to working directory"
 
 $(python -m venv venv)
