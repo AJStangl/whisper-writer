@@ -7,7 +7,8 @@ echo ":: Installing Python Virtual Environment to working directory"
 $(python -m venv venv)
 
 echo ":: Activating Python Virtual Environment"
-.virtualenvs/data-processing/bin/activate
+
+$(.\venv\Scripts\activate)
 
 echo ":: Installing Python packages"
 $(pip install -r requirements.txt)
